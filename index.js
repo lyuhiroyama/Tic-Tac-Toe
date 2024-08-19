@@ -1,5 +1,5 @@
 const Gameboard = (() => {
-    let gameboard = ["", "", "", "", "", "", "", "", ""]; // Private. Accessible via render().
+    let gameboard = ["", "", "", "", "", "", "", "", ""]; // Private variable.
     const render = () => {
         let boardHTML = "";
         gameboard.forEach((square, index) => {
@@ -16,9 +16,12 @@ const Gameboard = (() => {
         render();
     }
 
+    const getGameboard = () => gameboard; // Accessor method
+
     return {
         render,
-        update
+        update,
+        getGameboard
     }
 })();
 
@@ -39,14 +42,25 @@ const Game = (() => {
         gameOver = false;
         Gameboard.render();
     }
+
+    const restart = () => {
+        for (let i=0; i<9; i++) {
+            Gameboard.update(i, "");
+        }
+    }
+
     const handleClick = (event) => {
-        const index = parseInt(event.target.id.split("-")[1]);
-        Gameboard.update(index, players[currentPlayerIndex].mark)
+        let index = parseInt(event.target.id.split("-")[1]);
+        if (Gameboard.getGameboard()[index] != "") {
+            return;
+        }
+        Gameboard.update(index, players[currentPlayerIndex].mark);
         currentPlayerIndex = currentPlayerIndex === 0 ? 1 : 0;
     }
     
     return {
         start,
+        restart,
         handleClick
     }
 })();
@@ -54,4 +68,9 @@ const Game = (() => {
 const startButton = document.querySelector("#start-button");
 startButton.addEventListener("click", () => {
     Game.start();
+})
+
+const resetButton = document.querySelector('#restart-button');
+resetButton.addEventListener("click", () => {
+    Game.restart();
 })
